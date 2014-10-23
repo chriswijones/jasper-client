@@ -292,6 +292,40 @@ class GoogleSTT(AbstractSTTEngine):
     def is_available(cls):
         return diagnose.check_network_connection()
 
+class Wit(AbstractSTTEngine):
+    SLUG = 'wit'
+
+    def __init__(self, access_token=None):
+        import wit
+        if not access_token:
+            raise ValueError("No wit Access Token given")
+        self.access_token = access_token
+        self.wit = wit.Wit(token=self.access_token)
+
+    @classmethod
+    def get_config(cls):
+        # FIXME: Replace this as soon as we have a config module
+        config = {}
+        # HMM dir
+        # Try to get hmm_dir from config
+        profile_path = jasperpath.config('profile.yml')
+        if os.path.exists(profile_path):
+            with open(profile_path, 'r') as f:
+                profile = yaml.safe_load(f)
+                if 'keys' in profile and 'wit' in profile['keys']:
+                    config['access_token'] = profile['keys']['wit']
+        return config
+
+    def transcribe(self, fp, mode=TranscriptionMode.NORMAL):
+        data = fp.read()
+
+        response = self.wit.post_speech(data=data)
+
+        return response
+
+    @classmethod
+    def is_available(cls):
+        return diagnose.check_network_connection()
 
 def get_engines():
     return [stt_engine for stt_engine in AbstractSTTEngine.__subclasses__()
