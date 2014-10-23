@@ -300,7 +300,7 @@ class Wit(AbstractSTTEngine):
         if not access_token:
             raise ValueError("No wit Access Token given")
         self.access_token = access_token
-        self.wit = wit.Wit(token=self.access_token)
+        self.wit = wit.Wit(token=self.access_token, version='20141022')
 
     @classmethod
     def get_config(cls):
