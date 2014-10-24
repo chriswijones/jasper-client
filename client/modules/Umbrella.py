@@ -71,7 +71,7 @@ def get_forecast(api_key, lat, lng):
         else:
             return forecast['forecast']
 
-    forecast = forecastio.load_forecast(api_key, lat, lng, datetime.now())
+    forecast = forecastio.load_forecast(api_key, lat, lng, datetime.datetime.now())
     forecast_cache[forecast_key] = {'cache_date': time.time(), 'forecast': forecast}
     return forecast
 
