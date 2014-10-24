@@ -44,7 +44,7 @@ def handle(text, mic, profile):
     lng = profile['location']['longitude']
     now = datetime.datetime.now() #this should be determined dynamically
 
-    forecast = forecastio.load_forecast(api_key, lat, lng)
+    forecast = get_forecast(api_key, lat, lng)
 
     hourly = forecast.hourly()
 
