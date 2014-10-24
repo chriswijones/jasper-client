@@ -3,6 +3,7 @@
 #from app_utils import getTimezone
 #from semantic.dates import DateService
 import forecastio
+import time
 
 WORDS = ["WEATHER", "TODAY", "TOMORROW"]
 
@@ -37,12 +38,29 @@ def handle(text, mic, profile):
     lat = profile['location']['latitude']
     lng = profile['location']['longitude']
 
-    forecast = forecastio.load_forecast(api_key, lat, lng)
+    forecast = get_forecast(api_key, lat, lng)
 
     hourly = forecast.hourly()
     output = hourly.summary
 
     mic.say(output)
+
+forecast_cache = {}
+def get_forecast(api_key, lat, lng):
+
+    FORECAST_CACHE_EXPIRES_SECONDS = 15 * 60 #fifteen mintues
+
+    forecast_key = (lat, lng)
+    if forecast_key in forecast_cache:
+        forecast = forecast_cache[forecast_key]
+        if forecast['cache_date'] + FORECAST_CACHE_EXPIRES_SECONDS < time.time():
+            forecast_cache.pop(forecast_key)
+        else:
+            return forecast['forecast']
+
+    forecast = forecastio.load_forecast(api_key, lat, lng)
+    forecast_cache[forecast_key] = {'cache_date': time.time(), 'forecast': forecast}
+    return forecast
 
 
 def isValid(text):
@@ -53,3 +71,7 @@ def isValid(text):
         text -- user-input, typically transcribed speech
     """
     return any(d[u'intent'] == u'need_umbrella' for d in text[u'outcomes'])
+
+if __name__ == "__main__":
+    while True:
+        forecast = get_forecast('50c059b8e33da61e8273c9dca95f2177',47.597843, -122.328392)
