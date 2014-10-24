@@ -41,7 +41,7 @@ def handle(text, mic, profile):
 
     umbrella_needed = False
     for datum in hourly.data:
-        timewindow = datum.time().time()
+        timewindow = datum.time.time()
         #we should be subsetting this down based on time based config
         precipProbability = datum.d[u'precipProbability']
         precipIntensity = datum.d[u'precipIntensity']
