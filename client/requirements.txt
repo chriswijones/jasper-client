@@ -16,3 +16,4 @@ cmuclmtk==0.1.5
 #git+https://github.com/wit-ai/pywit.git
 #use pywit https://github.com/lextoumbourou/PyWit
 pywit
+python-forecastio
