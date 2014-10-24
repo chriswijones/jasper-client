@@ -3,7 +3,7 @@
 #from semantic.dates import DateService
 import forecastio
 import time
-from datetime import datetime
+import datetime
 
 WORDS = ["WEATHER", "TODAY", "TOMORROW"]
 
