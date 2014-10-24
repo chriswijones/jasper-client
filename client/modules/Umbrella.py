@@ -44,10 +44,11 @@ def handle(text, mic, profile):
 
     umbrella_needed, summary = need_umbrella(windows, forecast)
 
-
-
     output = summary
 
+    #Easter Egg!!!!
+    if entities.get(u'location') == u'seattle':
+        output += " But you won't bring one."
 
     mic.say(output)
 
