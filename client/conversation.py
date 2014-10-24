@@ -13,6 +13,7 @@ class Conversation(object):
         self.profile = profile
         self.brain = Brain(mic, profile)
         self.notifier = Notifier(profile)
+        self.shutdown = False
 
     def handleForever(self):
         """
@@ -20,7 +21,7 @@ class Conversation(object):
         """
         self._logger.info("Starting to handle conversation with keyword '%s'.",
                           self.persona)
-        while True:
+        while not self.shutdown:
             # Print notifications until empty
             notifications = self.notifier.getAllNotifications()
             for notif in notifications:
