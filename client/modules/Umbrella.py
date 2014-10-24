@@ -24,8 +24,6 @@ def handle(text, mic, profile):
                    number)
     """
 
-    text_obj = json.loads(text)
-
     if not profile['location']:
         mic.say(
             "I don't know where you are.")
@@ -71,8 +69,7 @@ def isValid(text):
         Arguments:
         text -- user-input, typically transcribed speech
     """
-    try:
-        text_obj = json.loads(text)
-        return any(d[u'intent'] == u'need_umbrella' for d in text_obj[u'outcomes'])
-    except:
+    if type(text) is dict:
+        return any(d.get(u'intent', u'') == u'need_umbrella' for d in text.get(u'outcomes', []))
+    else:
         return False

@@ -55,4 +55,8 @@ def isValid(text):
         Arguments:
         text -- user-input, typically transcribed speech
     """
-    return bool(re.search(r'\bnotification|Facebook\b', text, re.IGNORECASE))
+    if type(text) is dict:
+        _text = text.get(u'_text', u'')
+    else:
+        _text = text
+    return bool(re.search(r'\bnotification|Facebook\b', _text, re.IGNORECASE))

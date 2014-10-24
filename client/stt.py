@@ -321,7 +321,7 @@ class Wit(AbstractSTTEngine):
 
         response = self.wit.post_speech(data=data)
 
-        return [json.dumps(response)]
+        return [response]
 
     @classmethod
     def is_available(cls):
