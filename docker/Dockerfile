@@ -10,6 +10,7 @@ RUN \
 RUN sed 's/options snd-usb-audio index=-2/options snd-usb-audio index=0' /etc/modprobe.d/alsa-base.conf
 
 ADD bash_profile ~/.bash_profile
+ADD asound.conf /etc/asound.conf
 
 RUN \
   wget http://downloads.sourceforge.net/project/cmusphinx/sphinxbase/0.8/sphinxbase-0.8.tar.gz && \
