@@ -41,26 +41,53 @@ def handle(text, mic, profile):
 
     windows = get_time_windows(entities, profile)
 
-    hourly = forecast.hourly()
 
-    umbrella_needed = False
-    for datum in hourly.data:
-        timewindow = datum.time.time()
-        #we should be subsetting this down based on time based config
-        precipProbability = datum.d[u'precipProbability']
-        precipIntensity = datum.d[u'precipIntensity']
-        precipType = datum.d.get(u'precipType')
-        if precipType == u'rain' and precipProbability >= .5 and precipIntensity >= .01:
-            umbrella_needed = True
+    umbrella_needed, summary = need_umbrella(windows, forecast)
 
-    output = hourly.summary
 
-    if umbrella_needed:
-        output += u' You should bring an umbrella today.'
-    else:
-        output += u' You do not need an umbrella today.'
+
+    output = summary
+
 
     mic.say(output)
+
+def need_umbrella(windows, forecast):
+
+    #first what sort of aggregation are we looking for
+    two_days_delta = datetime.timedelta(days=2)
+    ret = False
+    summary = ''
+    #both start and end are within 2 days
+    for start, end in windows:
+        forecasts = []
+        if end < datetime.datetime.now() + two_days_delta:
+            forecasts = forecast.hourly()
+            start = start - datetime.timedelta(hours=1) #make sure we get the segment we are looking for
+        else:
+            forecasts = forecast.daily()
+            start = start - datetime.timedelta(days=1)
+
+
+        for f in forecasts.data:
+            if f.time > start and f.time < end:
+                precipProbability = f.d[u'precipProbability']
+                precipIntensity = f.d[u'precipIntensity']
+                precipType = f.d.get(u'precipType')
+                if precipType == u'rain' and precipProbability >= .5 and precipIntensity >= .01:
+                    ret = True
+                    summary = f.d.get(u'summary', '') #we need our umbrella short circuit rest
+                    break
+        if ret:
+            break
+
+    if ret:
+        summary = u' You should bring an umbrella.'
+    else:
+        summary = u' You do not need an umbrella.'
+
+    return ret, summary
+
+
 
 forecast_cache = {}
 def get_forecast(api_key, lat, lng):
@@ -75,7 +102,7 @@ def get_forecast(api_key, lat, lng):
         else:
             return forecast['forecast']
 
-    forecast = forecastio.load_forecast(api_key, lat, lng, datetime.datetime.now())
+    forecast = forecastio.load_forecast(api_key, lat, lng)
     forecast_cache[forecast_key] = {'cache_date': time.time(), 'forecast': forecast}
     return forecast
 
@@ -113,3 +140,17 @@ def isValid(text):
         return any(d.get(u'intent', u'') == u'need_umbrella' for d in text.get(u'outcomes', []))
     else:
         return False
+#
+# if __name__ == "__main__":
+#     while True:
+#         forecast = get_forecast('50c059b8e33da61e8273c9dca95f2177',47.597843,-122.328392)
+#         start = datetime.datetime.now()
+#         end = datetime.datetime.now()
+#         end = end  + datetime.timedelta(hours=2)
+#
+#         start = datetime.datetime(2014,10,26)
+#         end = datetime.datetime(2014,10,28)
+#
+#         windows = [(start, end)]
+#
+#         umbrella_needed, summary = aggregate_forecast(windows, forecast)
