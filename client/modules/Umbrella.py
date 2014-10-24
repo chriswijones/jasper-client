@@ -1,17 +1,11 @@
 # -*- coding: utf-8-*-
-#import datetime
 #from app_utils import getTimezone
 #from semantic.dates import DateService
 import forecastio
 import time
-import datetime
-import json
+from datetime import datetime
 
 WORDS = ["WEATHER", "TODAY", "TOMORROW"]
-
-#hardcoded latitude and longitude for Vulcan
-
-
 
 
 def handle(text, mic, profile):
@@ -40,7 +34,6 @@ def handle(text, mic, profile):
     api_key = profile['keys']['forecastio']
     lat = profile['location']['latitude']
     lng = profile['location']['longitude']
-    now = datetime.datetime.now() #this should be determined dynamically
 
     forecast = get_forecast(api_key, lat, lng)
 
@@ -57,6 +50,11 @@ def handle(text, mic, profile):
             umbrella_needed = True
 
     output = hourly.summary
+
+    if umbrella_needed:
+        output += u' You should bring an umbrella today.'
+    else:
+        output += u' You do not need an umbrella today.'
 
     mic.say(output)
 
