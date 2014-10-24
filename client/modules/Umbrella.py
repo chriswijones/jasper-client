@@ -1,12 +1,15 @@
 # -*- coding: utf-8-*-
-import datetime
+#import datetime
 #from app_utils import getTimezone
 #from semantic.dates import DateService
 import forecastio
+import time
+import datetime
 import json
 
 WORDS = ["WEATHER", "TODAY", "TOMORROW"]
 
+#hardcoded latitude and longitude for Vulcan
 
 
 
@@ -39,7 +42,7 @@ def handle(text, mic, profile):
     lng = profile['location']['longitude']
     now = datetime.datetime.now() #this should be determined dynamically
 
-    forecast = forecastio.load_forecast(api_key, lat, lng, now)
+    forecast = get_forecast(api_key, lat, lng)
 
     hourly = forecast.hourly()
 
@@ -54,12 +57,25 @@ def handle(text, mic, profile):
             umbrella_needed = True
 
     output = hourly.summary
-    if umbrella_needed:
-        output += u' You should bring an umbrella today.'
-    else:
-        output += u' You do not need an umbrella today.'
 
     mic.say(output)
+
+forecast_cache = {}
+def get_forecast(api_key, lat, lng):
+
+    FORECAST_CACHE_EXPIRES_SECONDS = 15 * 60 #fifteen mintues
+
+    forecast_key = (lat, lng)
+    if forecast_key in forecast_cache:
+        forecast = forecast_cache[forecast_key]
+        if forecast['cache_date'] + FORECAST_CACHE_EXPIRES_SECONDS < time.time():
+            forecast_cache.pop(forecast_key)
+        else:
+            return forecast['forecast']
+
+    forecast = forecastio.load_forecast(api_key, lat, lng, datetime.now())
+    forecast_cache[forecast_key] = {'cache_date': time.time(), 'forecast': forecast}
+    return forecast
 
 
 def isValid(text):
