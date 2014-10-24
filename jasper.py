@@ -2,6 +2,7 @@
 # -*- coding: utf-8-*-
 import os
 import sys
+import signal
 import shutil
 import logging
 
@@ -104,6 +105,11 @@ class Jasper(object):
                        stt.PocketSphinxSTT(**stt.PocketSphinxSTT.get_config()),
                        stt.newSTTEngine(stt_engine_type, api_key=api_key))
 
+    def get_sigint_handler(self, conversation):
+        def sigint_handler(signum, frame):
+            conversation.shutdown = True
+        return sigint_handler
+
     def run(self):
         if 'first_name' in self.config:
             salutation = ("How can I be of service, %s?"
@@ -114,7 +120,9 @@ class Jasper(object):
 
         persona_name = self.config.get('persona_name', 'JASPER')
         conversation = Conversation(persona_name, self.mic, self.config)
+        signal.signal(signal.SIGINT, self.get_sigint_handler(conversation))
         conversation.handleForever()
+
 
 if __name__ == "__main__":
 
