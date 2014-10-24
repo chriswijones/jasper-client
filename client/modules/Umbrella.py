@@ -71,10 +71,11 @@ def need_umbrella(windows, forecast):
 
         for f in forecasts.data:
             if f.time > start and f.time < end:
-                precipProbability = f.d[u'precipProbability']
-                precipIntensity = f.d[u'precipIntensity']
-                precipType = f.d.get(u'precipType')
-                if precipType == u'rain' and precipProbability >= .5 and precipIntensity >= .01:
+                #precipProbability = f.d.get(u'precipProbability')
+                #intensity = f.d.get(u'precipIntensityMax', f.d.get(u'precipIntensity', 0))
+                #precipType = f.d.get(u'precipType')
+                #if precipType == u'rain' and precipProbability >= .5 and Intensity >= .017:
+                if f.d.icon == u'rain':
                     ret = True
                     summary = f.d.get(u'summary', '') #we need our umbrella short circuit rest
                     break
