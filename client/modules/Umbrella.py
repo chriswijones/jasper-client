@@ -1,6 +1,6 @@
 # -*- coding: utf-8-*-
 #from app_utils import getTimezone
-#from semantic.dates import DateService
+from semantic.dates import DateService
 import forecastio
 import time
 import datetime
@@ -36,6 +36,10 @@ def handle(text, mic, profile):
     lng = profile['location']['longitude']
 
     forecast = get_forecast(api_key, lat, lng)
+
+    entities = text[u'outcomes'][0].get(u'entities', {})
+
+    windows = get_time_windows(entities, profile)
 
     hourly = forecast.hourly()
 
@@ -74,6 +78,28 @@ def get_forecast(api_key, lat, lng):
     forecast = forecastio.load_forecast(api_key, lat, lng, datetime.datetime.now())
     forecast_cache[forecast_key] = {'cache_date': time.time(), 'forecast': forecast}
     return forecast
+
+
+def get_time_windows(entities, profile):
+    ds = DateService()
+    windows = []
+    if u'datetime' in entities:
+        parsed_dates = entities.get(u'datetime')
+        for date in parsed_dates:
+            if date[u'type'] == u'value':
+                start_time = ds.extractDate(date[u'value'])
+                delta = date[u'grain'] + u's' #wit returns singular names of intervals
+                end_time = start_time + datetime.timedelta(**{delta: 1})
+            elif date[u'type'] == u'interval':
+                start_time = ds.extractDate(date[u'from'][u'value'])
+                end_time = ds.extractDate(date[u'to'][u'value'])
+            windows.append((start_time, end_time))
+    #Need to support looking up commute windows from the profile
+    else:
+        start_time = datetime.datetime(datetime.datetime.now(), datetime.time())
+        end_time = start_time + datetime.timedelta(days=1)
+        windows.append((start_time, end_time))
+    return windows
 
 
 def isValid(text):
