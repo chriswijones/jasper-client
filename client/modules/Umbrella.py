@@ -37,9 +37,10 @@ def handle(text, mic, profile):
     lat = profile['location']['latitude']
     lng = profile['location']['longitude']
 
-    forecast = forecastio.load_forecast(api_key,lat,lng)
+    forecast = forecastio.load_forecast(api_key, lat, lng)
 
-    output = forecast.hourly.summary()
+    hourly = forecast.hourly()
+    output = hourly.summary
 
     mic.say(output)
 
