@@ -71,5 +71,8 @@ def isValid(text):
         Arguments:
         text -- user-input, typically transcribed speech
     """
-    text_obj = json.loads(text)
-    return any(d[u'intent'] == u'need_umbrella' for d in text_obj[u'outcomes'])
+    try:
+        text_obj = json.loads(text)
+        return any(d[u'intent'] == u'need_umbrella' for d in text_obj[u'outcomes'])
+    except:
+        return False
