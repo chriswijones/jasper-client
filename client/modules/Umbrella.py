@@ -125,7 +125,7 @@ def get_time_windows(entities, profile):
             windows.append((start_time, end_time))
     #Need to support looking up commute windows from the profile
     else:
-        start_time = datetime.datetime(datetime.datetime.now(), datetime.time())
+        start_time = datetime.datetime.now()
         end_time = start_time + datetime.timedelta(days=1)
         windows.append((start_time, end_time))
     return windows
