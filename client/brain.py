@@ -21,11 +21,15 @@ class Brain(object):
 
         self.mic = mic
         self.profile = profile
-        self.modules = self.get_modules()
+        self.modules = self.get_modules(self.get_disabled_list(profile))
         self._logger = logging.getLogger(__name__)
 
     @classmethod
-    def get_modules(cls):
+    def get_disabled_list(cls, profile):
+        return [name.lower() for name in profile.get('disabled_modules', [])]
+
+    @classmethod
+    def get_modules(cls, disabled_modules):
         """
         Dynamically loads all the modules in the modules folder and sorts
         them by the PRIORITY key. If no PRIORITY is defined for a given
@@ -45,6 +49,10 @@ class Brain(object):
                 logger.warning("Skipped module '%s' due to an error.", name,
                                exc_info=True)
             else:
+                if name.lower() in disabled_modules:
+                    logger.info("Module %s disabled", name)
+                    continue
+
                 if hasattr(mod, 'WORDS'):
                     logger.debug("Found module '%s' with words: %r", name,
                                  mod.WORDS)

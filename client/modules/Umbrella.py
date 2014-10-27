@@ -86,11 +86,13 @@ def need_umbrella(windows, forecast):
                 precipType = f.d.get(u'precipType')
                 #if precipType == u'rain' and precipProbability >= .5 and Intensity >= .017:
                 logger.debug("icon: {icon}, precipType: {precipType}, precipProbability: {precipProbability}, intensity: {intensity{".format(icon=f.d.icon,precipType=precipType,precipProbability=precipProbability,intensity=intensity))
-                if f.d.icon == u'rain':
-                    logger.debug("Rain found.")
-                    ret = True
-                    summary = f.d.get(u'summary', '') #we need our umbrella short circuit rest
-                    break
+                try:
+                    if f.d['icon'] == u'rain':
+                        ret = True
+                        summary = f.d.get(u'summary', '') #we need our umbrella short circuit rest
+                        break
+                except KeyError:
+                    pass
         if ret:
             break
 

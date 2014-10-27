@@ -204,7 +204,7 @@ class MacOSXTTS(AbstractTTSEngine):
 
     @classmethod
     def is_available(cls):
-        return (platform.system() == 'darwin' and
+        return (platform.system().lower() == 'darwin' and
                 diagnose.check_executable('say') and
                 diagnose.check_executable('afplay'))
 
@@ -329,7 +329,7 @@ class GoogleTTS(AbstractMp3TTSEngine):
 
 
 def get_default_engine_slug():
-    return 'osx-tts' if platform.system() == 'darwin' else 'espeak-tts'
+    return 'osx-tts' if platform.system().lower() == 'darwin' else 'espeak-tts'
 
 
 def get_engine_by_slug(slug=None):
@@ -354,9 +354,7 @@ def get_engine_by_slug(slug=None):
                   "This is most certainly a bug." % slug)
         engine = selected_engines[0]
         if not engine.is_available():
-            raise ValueError("TTS engine '%s' is not available (due to " +
-                             "missing dependencies, missing " +
-                             "dependencies, etc.)" % slug)
+            raise ValueError("TTS engine '%s' is not available (due to missing dependencies, missing dependencies, etc.)" % slug)
         return engine
 
 
