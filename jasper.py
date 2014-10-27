@@ -118,7 +118,7 @@ class Jasper(object):
             salutation = "How can I be of service?"
         self.mic.say(salutation)
 
-        persona_name = self.config.get('persona_name', 'JASPER')
+        persona_name = self.config.get('persona_name', 'RALPH')
         conversation = Conversation(persona_name, self.mic, self.config)
         signal.signal(signal.SIGINT, self.get_sigint_handler(conversation))
         conversation.handleForever()
