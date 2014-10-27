@@ -5,6 +5,7 @@ import forecastio
 import time
 import datetime
 import logging
+import dtutil
 
 WORDS = ["WEATHER", "TODAY", "TOMORROW"]
 
@@ -135,12 +136,12 @@ def get_time_windows(entities, profile):
         parsed_dates = entities.get(u'datetime')
         for date in parsed_dates:
             if date[u'type'] == u'value':
-                start_time = ds.extractDate(date[u'value'])
+                start_time = dtutil.datetime_from_string(date[u'value'])
                 delta = date[u'grain'] + u's' #wit returns singular names of intervals
                 end_time = start_time + datetime.timedelta(**{delta: 1})
             elif date[u'type'] == u'interval':
-                start_time = ds.extractDate(date[u'from'][u'value'])
-                end_time = ds.extractDate(date[u'to'][u'value'])
+                start_time = dtutil.datetime_from_string(date[u'from'][u'value'])
+                end_time = dtutil.datetime_from_string(date[u'to'][u'value'])
             windows.append((start_time, end_time))
     #Need to support looking up commute windows from the profile
     else:
