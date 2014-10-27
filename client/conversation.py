@@ -2,6 +2,7 @@
 import logging
 from notifier import Notifier
 from brain import Brain
+import random
 
 
 class Conversation(object):
@@ -40,6 +41,7 @@ class Conversation(object):
 
             self._logger.debug("Started to listen actively with threshold: %r",
                                threshold)
+            self.mic.say(random.choice(["your wish is my command"]))
             input = self.mic.activeListenToAllOptions(threshold)
             self._logger.debug("Stopped to listen actively with threshold: %r",
                                threshold)
