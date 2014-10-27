@@ -53,7 +53,7 @@ def handle(text, mic, profile):
     output = summary
 
     #Easter Egg!!!!
-    if entities.get(u'location') == u'seattle':
+    if u'seattle' in [e.get(u'value', u'').lower() for e in entities.get(u'location', [])]:
         output += " But you won't bring one."
 
     mic.say(output)
