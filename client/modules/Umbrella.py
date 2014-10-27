@@ -39,8 +39,6 @@ def handle(text, mic, profile):
     lat = profile['location']['latitude']
     lng = profile['location']['longitude']
 
-    logger.debug("Getting forecast for {lat}, {lng}".format(lat=lat, lng=lng))
-
     forecast = get_forecast(api_key, lat, lng)
 
     entities = text[u'outcomes'][0].get(u'entities', {})
@@ -70,15 +68,18 @@ def need_umbrella(windows, forecast):
     for start, end in windows:
         forecasts = []
         if end < datetime.datetime.now() + two_days_delta:
+            logger.debug("Using hourly forecast")
             forecasts = forecast.hourly()
             start = start - datetime.timedelta(hours=1) #make sure we get the segment we are looking for
         else:
+            logger.debug("Using daily forecast")
             forecasts = forecast.daily()
             start = start - datetime.timedelta(days=1)
 
         #p_norain = 1
         for f in forecasts.data:
             if f.time > start and f.time < end:
+                logger.debug("Testing forecast unit {}".format(f.time))
                 precipProbability = f.d.get(u'precipProbability', 0)
                 #if f.d.get(u'precipType',u'') == u'rain':
                 #    p_norain = p_norain * (1 - precipProbability)
@@ -88,11 +89,14 @@ def need_umbrella(windows, forecast):
                 logger.debug(f.summary)
                 try:
                     if f.icon == u'rain':
+                        logger.debug("Rain found.")
                         ret = True
                         summary = f.d.get(u'summary', '') #we need our umbrella short circuit rest
                         break
                 except KeyError:
                     pass
+            else:
+                logger.debug("Skipping forecast unit {}".format(f.time))
         if ret:
             break
 
@@ -109,13 +113,14 @@ forecast_cache = {}
 def get_forecast(api_key, lat, lng):
 
     FORECAST_CACHE_EXPIRES_SECONDS = 15 * 60 #fifteen mintues
-
+    logger.debug("Getting forecast for {lat}, {lng}".format(lat=lat, lng=lng))
     forecast_key = (lat, lng)
     if forecast_key in forecast_cache:
         forecast = forecast_cache[forecast_key]
         if forecast['cache_date'] + FORECAST_CACHE_EXPIRES_SECONDS < time.time():
             forecast_cache.pop(forecast_key)
         else:
+            logger.debug("Using cached forecast")
             return forecast['forecast']
 
     forecast = forecastio.load_forecast(api_key, lat, lng)
