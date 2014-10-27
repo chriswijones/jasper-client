@@ -4,9 +4,11 @@ from semantic.dates import DateService
 import forecastio
 import time
 import datetime
+import logging
 
 WORDS = ["WEATHER", "TODAY", "TOMORROW"]
 
+logger = logging.getLogger(__name__)
 
 def handle(text, mic, profile):
     """
@@ -20,6 +22,8 @@ def handle(text, mic, profile):
         profile -- contains information related to the user (e.g., phone
                    number)
     """
+
+    mic.say("Let me check the forecast.")
 
     if not profile['location']:
         mic.say(
@@ -35,12 +39,16 @@ def handle(text, mic, profile):
     lat = profile['location']['latitude']
     lng = profile['location']['longitude']
 
+    logger.debug("Getting forecast for {lat}, {lng}".format(lat=lat, lng=lng))
+
     forecast = get_forecast(api_key, lat, lng)
 
     entities = text[u'outcomes'][0].get(u'entities', {})
 
     windows = get_time_windows(entities, profile)
 
+    for window in windows:
+        logger.debug("Window found from {} to {}".format(window[0], window[1]))
 
     umbrella_needed, summary = need_umbrella(windows, forecast)
 
@@ -68,14 +76,18 @@ def need_umbrella(windows, forecast):
             forecasts = forecast.daily()
             start = start - datetime.timedelta(days=1)
 
-
+        #p_norain = 1
         for f in forecasts.data:
             if f.time > start and f.time < end:
-                #precipProbability = f.d.get(u'precipProbability')
-                #intensity = f.d.get(u'precipIntensityMax', f.d.get(u'precipIntensity', 0))
-                #precipType = f.d.get(u'precipType')
+                precipProbability = f.d.get(u'precipProbability', 0)
+                #if f.d.get(u'precipType',u'') == u'rain':
+                #    p_norain = p_norain * (1 - precipProbability)
+                intensity = f.d.get(u'precipIntensityMax', f.d.get(u'precipIntensity', 0))
+                precipType = f.d.get(u'precipType')
                 #if precipType == u'rain' and precipProbability >= .5 and Intensity >= .017:
+                logger.debug("icon: {icon}, precipType: {precipType}, precipProbability: {precipProbability}, intensity: {intensity{".format(icon=f.d.icon,precipType=precipType,precipProbability=precipProbability,intensity=intensity))
                 if f.d.icon == u'rain':
+                    logger.debug("Rain found.")
                     ret = True
                     summary = f.d.get(u'summary', '') #we need our umbrella short circuit rest
                     break
@@ -125,7 +137,7 @@ def get_time_windows(entities, profile):
             windows.append((start_time, end_time))
     #Need to support looking up commute windows from the profile
     else:
-        start_time = datetime.datetime(datetime.datetime.now(), datetime.time())
+        start_time = datetime.datetime.combine(datetime.datetime.now(), datetime.time())
         end_time = start_time + datetime.timedelta(days=1)
         windows.append((start_time, end_time))
     return windows
