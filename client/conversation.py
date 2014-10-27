@@ -41,7 +41,7 @@ class Conversation(object):
 
             self._logger.debug("Started to listen actively with threshold: %r",
                                threshold)
-            self.mic.say(random.choice(["your wish is my command"]))
+            self.mic.say(random.choice(["your wish is my command", "what is thy bidding, my master", "I live to serve"]))
             input = self.mic.activeListenToAllOptions(threshold)
             self._logger.debug("Stopped to listen actively with threshold: %r",
                                threshold)
