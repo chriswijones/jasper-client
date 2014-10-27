@@ -12,6 +12,7 @@ from abc import ABCMeta, abstractmethod, abstractproperty
 
 import brain
 import jasperpath
+import settings
 
 from g2p import PhonetisaurusG2P
 try:
@@ -366,7 +367,8 @@ def get_all_phrases():
     """
     phrases = []
 
-    modules = brain.Brain.get_modules()
+
+    modules = brain.Brain.get_modules(settings.profile)
     for module in modules:
         phrases.extend(get_phrases_from_module(module))
 

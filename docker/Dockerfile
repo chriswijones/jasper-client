@@ -46,6 +46,7 @@ RUN \
   tar -xvf mitlm-0.4.1.tar.gz && \
   tar -xvf g014b2b.tgz && \
   cd ~/openfst-1.3.3/ && \
+  #sudo ./configure --enable-compact-fsts --enable-const-fsts --enable-far --enable-lookahead-fsts --enable-pdt CXX="clang++ -std=c++11 -stdlib=libstdc++"
   sudo ./configure --enable-compact-fsts --enable-const-fsts --enable-far --enable-lookahead-fsts --enable-pdt && \
   sudo make install && \
   cd ~/m2m-aligner-1.2/ && \
