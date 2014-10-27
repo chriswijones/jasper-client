@@ -129,18 +129,19 @@ def get_forecast(api_key, lat, lng):
 
 
 def get_time_windows(entities, profile):
+    isoformat = "%Y-%m-%dT%H:%M:%S.%f"
     ds = DateService()
     windows = []
     if u'datetime' in entities:
         parsed_dates = entities.get(u'datetime')
         for date in parsed_dates:
             if date[u'type'] == u'value':
-                start_time = ds.extractDate(date[u'value'])
+                start_time = datetime.datetime.strptime(date[u'value'][:-6], isoformat)
                 delta = date[u'grain'] + u's' #wit returns singular names of intervals
                 end_time = start_time + datetime.timedelta(**{delta: 1})
             elif date[u'type'] == u'interval':
-                start_time = ds.extractDate(date[u'from'][u'value'])
-                end_time = ds.extractDate(date[u'to'][u'value'])
+                start_time = datetime.datetime.strptime(date[u'from'][u'value'][:-6], isoformat)
+                end_time = datetime.datetime.strptime(date[u'to'][u'value'][:-6], isoformat)
             windows.append((start_time, end_time))
     #Need to support looking up commute windows from the profile
     else:
@@ -161,17 +162,17 @@ def isValid(text):
         return any(d.get(u'intent', u'') == u'need_umbrella' for d in text.get(u'outcomes', []))
     else:
         return False
-#
-# if __name__ == "__main__":
-#     while True:
-#         forecast = get_forecast('50c059b8e33da61e8273c9dca95f2177',47.597843,-122.328392)
-#         start = datetime.datetime.now()
-#         end = datetime.datetime.now()
-#         end = end  + datetime.timedelta(hours=2)
-#
-#         start = datetime.datetime(2014,10,26)
-#         end = datetime.datetime(2014,10,28)
-#
-#         windows = [(start, end)]
-#
-#         umbrella_needed, summary = aggregate_forecast(windows, forecast)
+
+if __name__ == "__main__":
+    while True:
+        forecast = get_forecast('50c059b8e33da61e8273c9dca95f2177',47.597843,-122.328392)
+        start = datetime.datetime.now()
+        end = datetime.datetime.now()
+        end = end  + datetime.timedelta(hours=2)
+
+        start = datetime.datetime(2014,10,26)
+        end = datetime.datetime(2014,10,28)
+
+        windows = get_time_windows({},{})
+
+        umbrella_needed, summary = need_umbrella(windows, forecast)
