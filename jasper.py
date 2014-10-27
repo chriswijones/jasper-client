@@ -118,10 +118,18 @@ class Jasper(object):
             salutation = "How can I be of service?"
         self.mic.say(salutation)
 
-        persona_name = self.config.get('persona_name', 'JASPER')
+        persona_name = self.config.get('persona_name', 'RALPH')
         conversation = Conversation(persona_name, self.mic, self.config)
         signal.signal(signal.SIGINT, self.get_sigint_handler(conversation))
         conversation.handleForever()
+
+def log_stdout(level=logging.DEBUG):
+    soh = logging.StreamHandler(sys.stdout)
+    soh.setLevel(level)
+    logger = logging.getLogger()
+    logger.addHandler(soh)
+    logger.setLevel(level)
+
 
 
 if __name__ == "__main__":
@@ -136,6 +144,9 @@ if __name__ == "__main__":
 
     if args.debug:
         logger.setLevel(logging.DEBUG)
+
+    log_stdout(logging.DEBUG)
+
 
     if not args.no_network_check and not diagnose.check_network_connection():
         logger.warning("Network not connected. This may prevent Jasper from " +
