@@ -159,7 +159,8 @@ def isValid(text):
         text -- user-input, typically transcribed speech
     """
     if type(text) is dict:
-        return any(d.get(u'intent', u'') == u'need_umbrella' for d in text.get(u'outcomes', []))
+        return True
+        #return any(d.get(u'intent', u'') == u'need_umbrella' for d in text.get(u'outcomes', []))
     else:
         return False
 #
