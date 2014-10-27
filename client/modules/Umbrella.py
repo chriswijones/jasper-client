@@ -54,7 +54,7 @@ def handle(text, mic, profile):
     output = summary
 
     #Easter Egg!!!!
-    if entities.get(u'location') == u'seattle':
+    if entities.get(u'location', u'').lower() == u'seattle':
         output += " But you won't bring one."
 
     mic.say(output)
