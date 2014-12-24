@@ -60,11 +60,7 @@ def isValid(text):
         Arguments:
         text -- user-input, typically transcribed speech
     """
-    if type(text) is dict:
-        _text = text.get(u'_text', u'')
-    else:
-        _text = text
-    return any(word in _text.upper() for word in WORDS)
+    return any(word in text.upper() for word in WORDS)
 
 
 # The interesting part

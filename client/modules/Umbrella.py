@@ -151,15 +151,15 @@ def get_time_windows(entities, profile):
     return windows
 
 
-def isValid(text):
+def isValidWit(text):
     """
         Returns True if the text is related to the weather.
 
         Arguments:
         text -- user-input, typically transcribed speech
     """
-    if type(text) is dict:
-        return any(d.get(u'intent', u'') == u'need_umbrella' for d in text.get(u'outcomes', []))
-    else:
-        return False
-#         umbrella_needed, summary = aggregate_forecast(windows, forecast)
+    return any(d.get(u'intent', u'') == u'need_umbrella' for d in text.get(u'outcomes', []))
+
+def isValid(text):
+    return False
+    #umbrella_needed, summary = aggregate_forecast(windows, forecast)

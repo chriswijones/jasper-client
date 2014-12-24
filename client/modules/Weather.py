@@ -114,9 +114,6 @@ def isValid(text):
         Arguments:
         text -- user-input, typically transcribed speech
     """
-    if type(text) is dict:
-        _text = text.get(u'_text', u'')
-    else:
-        _text = text
+
     return bool(re.search(r'\b(weathers?|temperature|forecast|outside|hot|' +
-                          r'cold|jacket|coat|rain)\b', _text, re.IGNORECASE))
+                          r'cold|jacket|coat|rain)\b', text, re.IGNORECASE))

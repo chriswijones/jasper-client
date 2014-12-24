@@ -31,8 +31,4 @@ def isValid(text):
         Arguments:
         text -- user-input, typically transcribed speech
     """
-    if type(text) is dict:
-        _text = text.get(u'_text', u'')
-    else:
-        _text = text
-    return bool(re.search(r'\bmeaning of life\b', _text, re.IGNORECASE))
+    return bool(re.search(r'\bmeaning of life\b', text, re.IGNORECASE))

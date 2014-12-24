@@ -64,6 +64,14 @@ class Brain(object):
                      else 0, reverse=True)
         return modules
 
+    def _isValid(self, module, text):
+        try:
+            return module.isValidWit(text)
+        except AttributeError:
+            if isinstance(text, dict):
+                text = text.get(u'_text', u'')
+            return module.isValid(text)
+
     def query(self, texts):
         """
         Passes user input to the appropriate module, testing it against
@@ -74,7 +82,7 @@ class Brain(object):
         """
         for module in self.modules:
             for text in texts:
-                if module.isValid(text):
+                if self._isValid(module, text):
                     self._logger.debug("'%s' is a valid phrase for module " +
                                        "'%s'", text, module.__name__)
                     try:
